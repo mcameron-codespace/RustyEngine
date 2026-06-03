@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OpenCode Workspace",
+            "type": "shell",
+            "command": "ocx oc -p ws",
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "group": "OpenCode"
+            }
+        },
+        {
+            "label": "Hermes",
+            "type": "shell",
+            "command": "hermes",
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "group": "Hermes"
+            }
+        },
+        {
+            "label": "RenderDocs",
+            "type": "shell",
+            "command": "./home/mouse/renderdoc/binrenderdocs",
+            "runOptions": {
+                "runOn": "default"
+            },
+            "presentation": {
+                "group": "RenderDocs"
+            }
+        }
+    ]
+}

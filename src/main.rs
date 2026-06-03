@@ -8,9 +8,8 @@ pub mod input;
 pub mod gameplay;
 pub mod ui;
 pub mod config;
-
-
-// use crate::ecs::*;
+pub mod logging;
+pub mod assets;
 
 fn main() {
     println!("Hello, world!");

@@ -1,32 +1,22 @@
 # AGENTS.md
 
-## Project overview
-- This repository is a Rust engine prototype named `rustyengine`.
-- The main architecture and roadmap are documented in [docs/design/Rusty-Engine-Design.md](docs/design/Rusty-Engine-Design.md) and [docs/design/Rusty-Engine-Implementation-Plan.md](docs/design/Rusty-Engine-Implementation-Plan.md).
+## Project
+- Rust engine prototype (`edition = "2024"`, single crate, **no `lib.rs`** — modules declared in `src/main.rs`).
+- Architecture: `docs/design/Rusty-Engine-Design.md`. Development plans live in `.hermes/plans/`.
 
-## Working conventions
-- Prefer small, focused changes in the relevant subsystem (`src/config/`, `src/input/`, `src/audio/`, `src/renderer/`, `src/physics/`, `src/network/`, `src/gameplay/`, `src/ecs/`, etc.).
-- Keep the existing modular layout and avoid introducing unrelated framework changes.
-- Use the shared config parser path in `src/config/parser.rs` when touching configuration behavior.
+## Build & test
+- `cargo test` from root. All tests are inline `#[cfg(test)]` unit tests (no `tests/` dir, no dev-dependencies).
+- Baseline: **29 tests passing**, `cargo check` green. No CI, no rustfmt/clippy config.
 
-## Build and test
-- Build and test with `cargo test` from the repository root.
-- If you need to validate only config-related work, run the narrowest relevant test target available after changes.
-- Current verified baseline: 29/29 tests passing, `cargo check` green.
+## Architecture highlights
+- **`main.rs` is a placeholder** — it prints `"Hello, world!"` and declares all 10 subsystems as `pub mod`. No runtime wiring exists yet.
+- **Commander** (`src/commander/`): `CommandBuffer<T>` bounded ring buffer + `CommandDispatcher` (holds audio/render/gameplay buffers). The decoupling mechanism for producer/consumer communication.
+- **Config** (`src/config/parser.rs`): custom INI parser. The file `config/engine-defaults.ini` is embedded as a string constant for first-run generation.
+- **ECS** (`src/ecs/`): sparse-set with runtime borrow-checking via `RefCell`. Not a framework — hand-rolled.
+- **Physics** (`src/physics/mod.rs`): `SimulationLoop` with accumulator-based fixed timestep; `Transform` stores dual `previous_`/`current_` state for interpolation.
+- Key dependency versions: wgpu 0.19, rapier3d 0.18, kira 0.8, winit 0.29, nalgebra 0.32.
 
-## Key directories
-- `src/config/`: configuration defaults, parser helpers, and config tests.
-- `src/input/`: input mapping/action abstractions and analog curve shaping.
-- `src/audio/`: spatial audio, collision-to-audio bridge, and `AudioSystem`.
-- `src/renderer/`: wgpu render pipeline scaffolding and `RenderCommand` queue.
-- `src/physics/`: Rapier3D simulation loop, interpolation helpers, and physics state.
-- `src/network/`: mock UDP transport and prediction/rollback buffers.
-- `src/commander/`: typed `CommandBuffer<T>` and central `CommandDispatcher` for decoupled producer/consumer communication.
-- `src/gameplay/`: terrain generation, vehicle dynamics, and `GameplaySystem` command consumption.
-- `src/ecs/`: modular Entity Component System abstractions and world management.
-- `src/ui/`: immediate-mode UI primitives and boundary tests.
-
-## Notes for agents
-- The typed command buffer infrastructure is defined in `src/commander/`, but the main runtime (`main.rs`) is still a placeholder and not yet integrating subsystems.
-- Keep command wiring additive and non-breaking; do not change behavior outside the targeted subsystem in a single batch.
-- Prefer linking to the existing design docs instead of duplicating their contents.
+## Conventions
+- Touch config behavior only through `src/config/parser.rs`.
+- Keep command wiring additive and non-breaking within a single batch.
+- Link to design docs instead of duplicating their contents.
